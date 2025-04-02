@@ -17,12 +17,8 @@ public class GatewayApplication {
     @Bean
     public RouteLocator gatewayRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("user-service", r -> r.path("/users/**")
-                        .uri("lb://user-service")) // Routage vers le service utilisateur
-                .route("event-service", r -> r.path("/events/**")
-                        .uri("lb://event-service")) // Routage vers le service événement
-                .route("partner-service", r -> r.path("/partenaires/**")
-                        .uri("lb://partner-service")) // Routage vers le service partenaires
+                .route("gestion-partenaires", r -> r.path("/api/partenaires/**")
+                        .uri("lb://GestionPartenaires")) // Routage vers le service "GestionPartenaires"
                 .build();
     }
 
