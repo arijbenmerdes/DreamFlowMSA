@@ -3,6 +3,10 @@ package com.esprit.microservice.partenaires.services;
 import com.esprit.microservice.partenaires.entities.Partenaires;
 import com.esprit.microservice.partenaires.repositories.PartenairesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,6 +48,30 @@ public class PartenairesService {
             return true;
         }
         return false;
+    }
+    public List<Partenaires> searchByName(String name) {
+        return partenairesRepository.findByNomContainingIgnoreCase(name);
+    }
+    public List<Partenaires> getAllSorted(String field, String direction) {
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(field).descending() : Sort.by(field).ascending();
+        return partenairesRepository.findAll(sort);
+    }
+    public List<Partenaires> getPaginated(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Partenaires> partenairesPage = partenairesRepository.findAll(pageable);
+        return partenairesPage.getContent();
+    }
+
+    public Partenaires toggleActivation(Long id, boolean active) {
+        Partenaires partenaire = partenairesRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Partenaire introuvable"));
+
+        partenaire.setActive(active); // isActive devient true/false selon paramètre
+        return partenairesRepository.save(partenaire);
+    }
+
+    public List<Partenaires> getByActivationStatus(boolean isActive) {
+        return partenairesRepository.findByIsActive(isActive);
     }
 
 }

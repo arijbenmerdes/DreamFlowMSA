@@ -21,7 +21,7 @@ public class Partenaires {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    private String nom;
     private String type;
     private String description;
     @JsonFormat(pattern = "yyyy-MM-dd")
