@@ -1,0 +1,57 @@
+services:
+  discovery-service:
+    container_name: discovery-service
+    build: ./eureka
+    ports:
+      - "8761:8761"
+    environment:
+     - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
+     - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport=false
+    networks:
+      - my_network
+
+  gateway-service:
+    container_name: gateway
+    build: ./gateway
+    ports:
+      - "8765:8765"
+    depends_on:
+    - discovery-service
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    
+   
+
+  partenaires-service:
+    container_name: partenaires-service
+    build: ./gestionpartenaires
+    ports:
+      - "8083:8083"
+    depends_on:
+      - mysql
+      - discovery-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/gestion_partenaires?createDatabaseIfNotExist=true&useSSL=false&max_allowed_packet=15728640&allowPublicKeyRetrieval=true  
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    networks:
+      - my_network
+
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "mysql_db"
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: "root"
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    networks:
+      - my_network
+      
+networks:
+      my_network:
